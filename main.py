@@ -14,6 +14,13 @@ def select_current_color( color_name):
 
     return new_color,rgb
 
+def is_final_tree_level(x1,y1,x2,y2,sentence):
+    next_level = x1+24<x2 and y1+24<y2
+    completion = [" containing", " that contains", " which contains", " having inside"]
+    if next_level:
+        tmp = random.randint(0,3)
+        sentence+=completion[tmp]
+    return next_level,sentence
 
 # create black background
 im = Image.new('RGB', (1000, 1000), (0, 0, 0))
@@ -50,26 +57,28 @@ while next_level:
 
     if shape==0:
         # square
-        #print(x1,x2,y1,x2)
         draw.rectangle([x1,y1,x2,y2],width=3,fill=rgb)
+        # update points
         x1,x2,y1,y2 = new_cordinate(x1,x2,y1,y2)
-        child = etree.Element('child',color=color_name,shape='square')
+        # update tree
+        child = etree.Element('node',color=color_name,shape='square')
         last_node.append(child)
         last_node=child
+        # update sentence
         sentence+=" a "+color_name+" square"
     else:
         # circle
-        #print(x1,x2,y1,x2)
         draw.ellipse([x1,y1,x2,y2],width=3,fill=rgb)
+        # update points
         x1,x2,y1,y2 = new_cordinate_circle(x1,x2,y1,y2)
-        child = etree.Element('child',color=color_name,shape='circle')
+        # update tree
+        child = etree.Element('node',color=color_name,shape='circle')
         last_node.append(child)
         last_node = child
+        # update sentence
         sentence+=" a "+color_name+" circle"
 
-    next_level = x1+24<x2 and y1+24<y2
-    if next_level:
-        sentence+=" containing"
+    next_level,sentence=is_final_tree_level(x1,y1,x2,y2,sentence)
     spaces.append((x1,y1,x2,y2))
     current_depth+=1
     current_degree = random.randint(1,4)
