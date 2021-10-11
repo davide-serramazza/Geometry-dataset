@@ -4,6 +4,17 @@ import random
 from new_coordinate import new_cordinate,new_cordinate_circle
 from lxml import etree
 
+
+def select_current_color( color_name):
+
+    new_color=color_name
+    while new_color==color_name:
+        choosed_color = random.randint(0, len(color_list) - 1)
+        new_color,rgb = color_list[choosed_color]
+
+    return new_color,rgb
+
+
 # create black background
 im = Image.new('RGB', (1000, 1000), (0, 0, 0))
 draw = ImageDraw.Draw(im)
@@ -23,6 +34,9 @@ last_node = root
 sentence="A Black background and"
 
 next_level = True
+
+color_name = "Black"
+
 while next_level:
     s=spaces.pop()
     print(s,spaces)
@@ -31,10 +45,8 @@ while next_level:
     y1 = s[1]
     y2 = s[3]
 
-    # select current shape and color
-    shape = random.randint(0,1)
-    choosed_color = random.randint(0,len(color_list)-1)
-    color_name,rgb = color_list[choosed_color]
+    shape = random.randint(0, 1)
+    color_name,rgb = select_current_color(color_name)
 
     if shape==0:
         # square
@@ -55,7 +67,7 @@ while next_level:
         last_node = child
         sentence+=" a "+color_name+" circle"
 
-    next_level = x1<x2 and y1<y2
+    next_level = x1+24<x2 and y1+24<y2
     if next_level:
         sentence+=" containing"
     spaces.append((x1,y1,x2,y2))
