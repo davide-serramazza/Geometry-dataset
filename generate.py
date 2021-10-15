@@ -3,7 +3,7 @@ import random
 from lxml import etree
 from helper_functions import select_current_color, new_cordinate,new_cordinate_circle,is_final_tree_level
 
-def generate_example(spaces,im,root,color_list):
+def generate_example(spaces,im,root,color_list,depth_range):
 
     draw = ImageDraw.Draw(im)
     current_depth=0
@@ -47,7 +47,7 @@ def generate_example(spaces,im,root,color_list):
             sentence += " a " + color_name + " circle"
 
         current_depth += 1
-        next_level, sentence = is_final_tree_level(x1, y1, x2, y2, sentence,current_depth)
+        next_level, sentence = is_final_tree_level(x1, y1, x2, y2, sentence,current_depth,depth_range)
         spaces.append((x1, y1, x2, y2))
         current_degree = random.randint(1, 4)
 

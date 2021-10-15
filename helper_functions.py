@@ -25,11 +25,15 @@ def select_current_color( color_list,color_name):
 
     return new_color,rgb
 
-def is_final_tree_level(x1,y1,x2,y2,sentence,current_depth):
-    if current_depth==12:
+def is_final_tree_level(x1,y1,x2,y2,sentence,current_depth,depth_range):
+    min_depth = depth_range[0]
+    max_depth = depth_range[1]
+    if current_depth==(max_depth-1):
         next_level = False
+    elif current_depth>=min_depth:
+        next_level = (x1+24<x2 and y1+24<y2) and random.random() > 0.5
     else:
-        next_level = x1+24<x2 and y1+24<y2
+        next_level = (x1+24<x2 and y1+24<y2)
     completion = [" containing", " that contains", " which contains", " having inside", " which has"," that has", ]
     if next_level:
         tmp = random.randint(0,3)
