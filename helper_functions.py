@@ -34,9 +34,10 @@ def is_final_tree_level(x1,y1,x2,y2,sentence,current_depth,depth_range):
         next_level = (x1+24<x2 and y1+24<y2) and random.random() > 0.5
     else:
         next_level = (x1+24<x2 and y1+24<y2)
-    completion = [" containing", " that contains", " which contains", " having inside", " which has"," that has", ]
+    #TODO next step is to try different captions for one image
+    completion = [" containing"]#, " that contains", " which contains", " having inside", " which has"," that has", ]
     if next_level:
-        tmp = random.randint(0,3)
+        tmp = 0 #random.randint(0,3)
         sentence+=completion[tmp]
     return next_level,sentence
 

@@ -7,7 +7,7 @@ import os
 
 def main():
 
-    n_ex4depth=5 #TODO command line arg
+    n_ex4depth=1000 #TODO command line arg
     min_depth = 5
     max_depth = 10
     depth_range = (min_depth,max_depth) #TODO coomand line arg
@@ -49,11 +49,10 @@ def main():
 
         # print current filling level of store data structure
         i+=1
-        if i%100==0:
+        if i%1000==0:
             for el in examples.keys():
                 print(el,":",len(examples[el]["sens"]),end=";\t")
             print("\n")
-
 
     # save generated examples
     with open("my_dataset_sentences.txt","w+") as sen_file:
