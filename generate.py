@@ -3,14 +3,12 @@ import random
 from lxml import etree
 from helper_functions import select_current_color, new_cordinate,new_cordinate_circle,is_final_tree_level
 
-def generate_example(spaces,im,root,color_list,depth_range):
+def generate_example(spaces,im,root,color_list,depth_range,color_name,sentence):
 
     draw = ImageDraw.Draw(im)
     current_depth=0
     last_node=root
     next_level = True
-    color_name = "Black"
-    sentence="A Black background and"
 
     while next_level:
         s = spaces.pop()

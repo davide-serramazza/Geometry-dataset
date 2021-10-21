@@ -14,7 +14,7 @@ def new_cordinate_circle(x1, x2, y1, y2):
     return x1, x2, y1, y2
 
 def new_cordinate(x1,x2,y1,y2):
-    return  x1+50, x2-50,y1+50,y2-50
+    return  x1+25, x2-25,y1+25,y2-25
 
 def select_current_color( color_list,color_name):
 
@@ -31,9 +31,9 @@ def is_final_tree_level(x1,y1,x2,y2,sentence,current_depth,depth_range):
     if current_depth==(max_depth-1):
         next_level = False
     elif current_depth>=min_depth:
-        next_level = (x1+24<x2 and y1+24<y2) and random.random() > 0.5
+        next_level = (x1+13<x2 and y1+13<y2) and random.random() > 0.5
     else:
-        next_level = (x1+24<x2 and y1+24<y2)
+        next_level = (x1+13<x2 and y1+13<y2)
     #TODO next step is to try different captions for one image
     completion = [" containing"]#, " that contains", " which contains", " having inside", " which has"," that has", ]
     if next_level:

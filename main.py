@@ -2,14 +2,15 @@ from color import color_list
 from PIL import Image
 from generate import generate_example
 from lxml import etree
-from helper_functions import check_completion
+from helper_functions import check_completion, select_current_color
 import os
+from tqdm import tqdm
 
 def main():
 
-    n_ex4depth=1000 #TODO command line arg
+    n_ex4depth=2000 #TODO command line arg
     min_depth = 5
-    max_depth = 10
+    max_depth = 11
     depth_range = (min_depth,max_depth) #TODO coomand line arg
     # data structure for store input and targets
     examples =  dict.fromkeys( [i for i in range(min_depth,max_depth)])
@@ -23,18 +24,21 @@ def main():
     while to_continue:
 
         # create black background
-        im = Image.new('RGB', (1000, 1000), (0, 0, 0))
+        background_color,rgb = select_current_color(color_list,"")
+        im = Image.new('RGB', (550, 550), rgb)
+        initial_sentene = "A "+background_color+ " background and"
 
         # initialize tree sentence and current color
         root = etree.Element("background", color="Black")
 
         # keep track of depth and breadth, current coordinates and a tree and a sentence as targets
-        x1 = 25
-        x2= 975
-        y1= 25
-        y2= 975
+        #TODO togliere costanti
+        x1 = 12
+        x2= 538
+        y1= 12
+        y2= 538
         spaces = [(x1,y1,x2,y2)]
-        sentence,depth = generate_example(spaces,im,root,color_list,depth_range)
+        sentence,depth = generate_example(spaces,im,root,color_list,depth_range,background_color,initial_sentene)
         tree_string = etree.tostring(root, pretty_print=True)
 
         # check if already generated
@@ -55,22 +59,22 @@ def main():
             print("\n")
 
     # save generated examples
+    print("saving")
     with open("my_dataset_sentences.txt","w+") as sen_file:
         for depth in examples.keys():
-            for i in range(len(examples[depth]["sens"])):
-                name = str(depth)+"_"+str(i)
+            for i in tqdm(range(len(examples[depth]["sens"]))):
+                name = str(depth).zfill(3)+"_"+str(i).zfill(4)
                 sen = examples[depth]["sens"][i]
                 img = examples[depth]["imgs"][i]
                 tree_s = examples[depth]["tree_strings"][i]
                 # first plain captions in a single txt files
                 sen_file.write(name+" : "+sen+"\n")
                 img.save(os.path.join("images",name+".png"))
+                img.convert('L').save(os.path.join("grays",name+".png"))
                 with open(os.path.join("trees",name+".xml"),'w+') as f:
                     f.write(tree_s.decode('utf8'))
                 f.close()
     sen_file.close()
-    # images
-
 
 
 if __name__ == "__main__":
