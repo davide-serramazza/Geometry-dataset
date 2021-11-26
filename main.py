@@ -8,14 +8,14 @@ from tqdm import tqdm
 
 def main():
 
-    n_ex4depth=6000 #TODO command line arg
-    min_depth = 5
-    max_depth = 11
+    n_ex4depth=5 #TODO command line arg
+    min_depth = 2
+    max_depth = 4
     depth_range = (min_depth,max_depth) #TODO coomand line arg
     # data structure for store input and targets
     examples =  dict.fromkeys( [i for i in range(min_depth,max_depth)])
     for el in examples.keys():
-        examples[el]  ={"imgs": [], "sens": [],"tree_strings" : [] , "segs" : []}
+        examples[el]  ={"imgs": [], "sens": [],"tree_strings" : []}
 
 
     # initialize while condition, number of loop counter and file for "plain" sentences
@@ -25,22 +25,20 @@ def main():
 
         #TODO background sempre nero etichettato come root in albero
         # create black background initial sentence and segmentation map
-        background_color,rgb = select_current_color(color_list,"")
-        im = Image.new('RGB', (550, 550), rgb)
-        segmentaion =  Image.new('L', (550, 550), (1))
-        initial_sentene = "A "+background_color+ " background and"
+        im = Image.new('RGB', (550, 550), (255,255,255))
+        segmentaion =  Image.new('L', (550, 550), (0))
+        initial_sentene = ""
 
         # initialize tree sentence and current color
-        root = etree.Element("background", color="Black")
-
+        root = etree.Element("root")
         # keep track of depth and breadth, current coordinates and a tree and a sentence as targets
         #TODO togliere costanti
-        x1 = 12
-        x2= 538
-        y1= 12
-        y2= 538
+        x1 = 0
+        x2=  550
+        y1=  0
+        y2=  550
         spaces = [(x1,y1,x2,y2)]
-        sentence,depth = generate_example(spaces,im,segmentaion,root,color_list,depth_range,background_color,initial_sentene)
+        sentence,depth = generate_example(spaces,im,segmentaion,root,color_list,depth_range,initial_sentene)
         tree_string = etree.tostring(root, pretty_print=True)
 
         # check if already generated
@@ -49,7 +47,6 @@ def main():
             bucket["tree_strings"].append(tree_string)
             bucket["imgs"].append(im)
             bucket["sens"].append(sentence)
-            bucket["segs"].append(segmentaion)
 
         # check completion of the loop
         to_continue = check_completion(examples,n_ex4depth)
@@ -70,7 +67,6 @@ def main():
                 sen = examples[depth]["sens"][i]
                 img = examples[depth]["imgs"][i]
                 tree_s = examples[depth]["tree_strings"][i]
-                segmentaion = examples[depth]["segs"][i]
                 # first plain captions in a single txt files
                 sen_file.write(name+" : "+sen+"\n")
                 img.save(os.path.join("images",name+".png"))
