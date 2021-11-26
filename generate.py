@@ -3,9 +3,10 @@ import random
 from lxml import etree
 from helper_functions import select_current_color, new_cordinate,new_cordinate_circle,is_final_tree_level
 
-def generate_example(spaces,im,root,color_list,depth_range,color_name,sentence):
+def generate_example(spaces,im,segmentaion,root,color_list,depth_range,color_name,sentence):
 
     draw = ImageDraw.Draw(im)
+    seg = ImageDraw.Draw(segmentaion)
     current_depth=0
     last_node=root
     next_level = True
@@ -24,6 +25,7 @@ def generate_example(spaces,im,root,color_list,depth_range,color_name,sentence):
         if shape == 0:
             # square
             draw.rectangle([x1, y1, x2, y2], width=3, fill=rgb)
+            seg.rectangle([x1, y1, x2, y2], width=3, fill=(current_depth+2))
             # update points
             x1, x2, y1, y2 = new_cordinate(x1, x2, y1, y2)
             # update tree
@@ -35,6 +37,7 @@ def generate_example(spaces,im,root,color_list,depth_range,color_name,sentence):
         else:
             # circle
             draw.ellipse([x1, y1, x2, y2], width=3, fill=rgb)
+            seg.ellipse([x1, y1, x2, y2], width=3, fill=(current_depth+2))
             # update points
             x1, x2, y1, y2 = new_cordinate_circle(x1, x2, y1, y2)
             # update tree
