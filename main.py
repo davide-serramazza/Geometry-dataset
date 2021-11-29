@@ -8,14 +8,18 @@ from tqdm import tqdm
 
 def main():
 
-    n_ex4depth=5 #TODO command line arg
+        #TODO background sempre nero etichettato come root in albero
+        #TODO sistemare segmentation che prende sempre ultima immagine prodotta
+        #TODO rivedere spazio fra una figura e quella nested
+        #TODO max e min breath come argomento?
+    n_ex4depth=2000 #TODO command line arg
     min_depth = 2
     max_depth = 4
     depth_range = (min_depth,max_depth) #TODO coomand line arg
     # data structure for store input and targets
     examples =  dict.fromkeys( [i for i in range(min_depth,max_depth)])
     for el in examples.keys():
-        examples[el]  ={"imgs": [], "sens": [],"tree_strings" : []}
+        examples[el]  ={"imgs": [], "sens": [],"tree_strings" : [], "segs":[]}
 
 
     # initialize while condition, number of loop counter and file for "plain" sentences
@@ -23,11 +27,9 @@ def main():
     i=0
     while to_continue:
 
-        #TODO background sempre nero etichettato come root in albero
         # create black background initial sentence and segmentation map
         im = Image.new('RGB', (550, 550), (255,255,255))
-        segmentaion =  Image.new('L', (550, 550), (0))
-        initial_sentene = ""
+        segmentation =  Image.new('L', (550, 550), (0))
 
         # initialize tree sentence and current color
         root = etree.Element("root")
@@ -38,7 +40,7 @@ def main():
         y1=  0
         y2=  550
         spaces = [(x1,y1,x2,y2)]
-        sentence,depth = generate_example(spaces,im,segmentaion,root,color_list,depth_range,initial_sentene)
+        sentence,depth = generate_example(spaces,im,segmentation,root,color_list,depth_range)
         tree_string = etree.tostring(root, pretty_print=True)
 
         # check if already generated
@@ -47,6 +49,7 @@ def main():
             bucket["tree_strings"].append(tree_string)
             bucket["imgs"].append(im)
             bucket["sens"].append(sentence)
+            bucket["segs"].append(segmentation)
 
         # check completion of the loop
         to_continue = check_completion(examples,n_ex4depth)
@@ -67,11 +70,12 @@ def main():
                 sen = examples[depth]["sens"][i]
                 img = examples[depth]["imgs"][i]
                 tree_s = examples[depth]["tree_strings"][i]
+                seg = examples[depth]["segs"][i]
                 # first plain captions in a single txt files
                 sen_file.write(name+" : "+sen+"\n")
                 img.save(os.path.join("images",name+".png"))
                 img.convert('L').save(os.path.join("grays",name+".png"))
-                segmentaion.save(os.path.join("segmentations",name+".png"))
+                seg.save(os.path.join("segmentations",name+".png"))
                 with open(os.path.join("trees",name+".xml"),'w+') as f:
                     f.write(tree_s.decode('utf8'))
                 f.close()

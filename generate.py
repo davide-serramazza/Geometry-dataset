@@ -4,17 +4,26 @@ import numpy as np
 from lxml import etree
 from helper_functions import select_current_color, new_cordinate,new_cordinate_circle,is_final_tree_level
 
-def generate_example(spaces,im,segmentaion,root,color_list,depth_range,sentence):
+def generate_sentence(tree):
+    sentence=""
+    for node in tree:
+        completion = [" containing"]#, " that contains", " which contains", " having inside", " which has"," that has", ]
+        tmp = 0 #random.randint(0,3)
+        to_use = completion[tmp]
+        sentence+="a " + node.attrib["color"]+" "+node.attrib["shape"]+" "+to_use+" "+str(len(node.getchildren()))+" other shapes and "
+    return sentence[:-5]
+
+def generate_example(spaces,im,segmentaion,root,color_list,depth_range):
 
     draw = ImageDraw.Draw(im)
     seg = ImageDraw.Draw(segmentaion)
     current_depth=0
     current_fig_n=1
-    last_node=root
+    nodes=[root]
     next_level = True
-    new_spaces = []
+    next_level_data = {"areas":[],"subtrees":[]}
     while next_level:
-        for s in spaces:
+        for (s,last_node) in zip(spaces,nodes):
             x1 = s[0];x2 = s[2];y1 = s[1];y2 = s[3]
             currents_quarter = [(x1, y1 , x1+(x2-x1)/2 , y1+(y2-y1)/2),
                                 ( x1+(x2-x1)/2 ,y1 , x2 , y1+(y2-y1)/2),
@@ -38,7 +47,6 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,sentence)
                     child = etree.Element('node', color=color_name, shape='square')
                     last_node.append(child)
                     # update sentence
-                    sentence += " a " + color_name + " square"
                 else:
                     # circle
                     draw.ellipse([x1-3, y1-3, x2-3, y2-3], width=2, fill=rgb, outline=(0,0,0))
@@ -49,13 +57,16 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,sentence)
                     child = etree.Element('node', color=color_name, shape='circle')
                     last_node.append(child)
                     # update sentence
-                    sentence += " a " + color_name + " circle"
-                new_spaces.append( (x1,y1,x2,y2) )
+                next_level_data["areas"].append( (x1,y1,x2,y2) )
+                next_level_data["subtrees"].append(child)
                 current_fig_n+=1
 
-        spaces = new_spaces
-        new_spaces = []
         current_depth += 1
-        next_level, sentence = is_final_tree_level(x1, y1, x2, y2, sentence,current_depth,depth_range)
+        next_level = is_final_tree_level(x1, y1, x2, y2,current_depth,depth_range)
+        spaces = next_level_data["areas"]
+        next_level_data["areas"] = []
+        nodes = next_level_data["subtrees"]
+        next_level_data["subtrees"] = []
 
+    sentence = generate_sentence(root.getchildren())
     return sentence, current_depth
