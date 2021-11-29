@@ -8,7 +8,6 @@ from tqdm import tqdm
 
 def main():
 
-        #TODO sistemare segmentation che prende sempre ultima immagine prodotta
     n_ex4depth=2 #TODO command line arg
     min_depth = 2
     max_depth = 5
@@ -32,7 +31,7 @@ def main():
         segmentation =  Image.new('L', (550, 550), (0))
 
         # initialize tree sentence and current color
-        root = etree.Element("root")
+        root = etree.Element("root",label=str(0))
         # keep track of depth and breadth, current coordinates and a tree and a sentence as targets
         #TODO togliere costanti
         x1 = 0
