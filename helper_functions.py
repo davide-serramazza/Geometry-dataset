@@ -15,7 +15,8 @@ def new_cordinate_circle(x1, x2, y1, y2):
     return x1, x2, y1, y2
 
 def new_cordinate(x1,x2,y1,y2):
-    return  x1+25, x2-25,y1+25,y2-25
+    min_space = 7
+    return  x1+min_space, x2-min_space,y1+min_space,y2-min_space
 
 def select_current_color( color_list):
 

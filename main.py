@@ -8,14 +8,14 @@ from tqdm import tqdm
 
 def main():
 
-        #TODO background sempre nero etichettato come root in albero
         #TODO sistemare segmentation che prende sempre ultima immagine prodotta
-        #TODO rivedere spazio fra una figura e quella nested
-        #TODO max e min breath come argomento?
-    n_ex4depth=2000 #TODO command line arg
+    n_ex4depth=2 #TODO command line arg
     min_depth = 2
-    max_depth = 4
+    max_depth = 5
+    min_breadth = 1
+    max_breadth=2
     depth_range = (min_depth,max_depth) #TODO coomand line arg
+    breadth_range = (min_breadth,max_breadth)
     # data structure for store input and targets
     examples =  dict.fromkeys( [i for i in range(min_depth,max_depth)])
     for el in examples.keys():
@@ -40,7 +40,7 @@ def main():
         y1=  0
         y2=  550
         spaces = [(x1,y1,x2,y2)]
-        sentence,depth = generate_example(spaces,im,segmentation,root,color_list,depth_range)
+        sentence,depth = generate_example(spaces,im,segmentation,root,color_list,depth_range,breadth_range)
         tree_string = etree.tostring(root, pretty_print=True)
 
         # check if already generated
