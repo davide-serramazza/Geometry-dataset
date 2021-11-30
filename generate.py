@@ -6,12 +6,35 @@ from helper_functions import select_current_color, new_cordinate,new_cordinate_c
 
 def generate_sentence(tree):
     sentence=""
+    completion = ["containing"]#, " that contains", " which contains", " having inside", " which has"," that has", ]
+    first_level_n = len(tree)
+
+    for i in range(first_level_n):
+        tree.append(tree[i].getchildren())
+
+    i=0
     for node in tree:
-        completion = [" containing"]#, " that contains", " which contains", " having inside", " which has"," that has", ]
-        tmp = 0 #random.randint(0,3)
-        to_use = completion[tmp]
-        sentence+="a " + node.attrib["color"]+" "+node.attrib["shape"]+" "+to_use+" "+str(len(node.getchildren()))+" other shapes and "
-    return sentence[:-5]
+        if type(node)==etree._Element:
+            sentence+="and a " + node.attrib["color"]+" "+node.attrib["shape"]+" "
+            #sentence+="a " + node.attrib["color"]+" "+node.attrib["shape"]+" "+to_use+" "+str(len(node.getchildren()))+" other shapes and "
+        elif type(node)==list and node!=[]:
+            if sentence.count(":")==0:
+                sentence+=": "
+            d = { 0 : "first one", 1 : "second one", 2 : "third one" , 3 : "fourth"}
+            tmp = 0 #random.randint(0,len(completion))
+            to_use = completion[tmp]
+            sentence+= "the "+d[i] +" " +to_use+" "
+            for child in node:
+                grandchild = len(child.getchildren())
+                if child!=node[0]:
+                    sentence+="and "
+                sentence+="a " + child.attrib["color"]+" "+child.attrib["shape"]+ " in turn "+to_use+ " " + str(grandchild)+" other shapes "
+            sentence=sentence[:-1]+"; "
+            i+=1
+    if tree[-1]==[] :
+        return sentence[4:-1]
+    else:
+        return sentence[4:-2]
 
 def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_range):
 
@@ -39,7 +62,7 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_r
                     child, x1, x2, y1, y2 = draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2,y1, y2)
                 else:               # circle
                     child, x1, x2, y1, y2 = draw_circle(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1, y2)
-                    # update sentence
+
                 next_level_data["areas"].append( (x1,y1,x2,y2) )
                 next_level_data["subtrees"].append(child)
                 current_fig_n+=1
@@ -48,7 +71,7 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_r
         # the next iteration
         current_depth += 1
         next_level = is_final_tree_level(x1, y1, x2, y2,current_depth,depth_range)
-        if next_level:
+        if next_level:  #TODO move in is_final_tree_level function
             spaces = next_level_data["areas"]
             next_level_data["areas"] = []
             nodes = next_level_data["subtrees"]

@@ -8,11 +8,11 @@ from tqdm import tqdm
 
 def main():
 
-    n_ex4depth=2 #TODO command line arg
-    min_depth = 2
+    n_ex4depth=3 #TODO command line arg
+    min_depth = 1
     max_depth = 5
     min_breadth = 1
-    max_breadth=2
+    max_breadth=3
     depth_range = (min_depth,max_depth) #TODO coomand line arg
     breadth_range = (min_breadth,max_breadth)
     # data structure for store input and targets
