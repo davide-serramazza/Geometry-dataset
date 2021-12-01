@@ -3,6 +3,28 @@ import subprocess
 from tqdm import tqdm
 import sys
 
+
+current_dir = os.getcwd()
+
+new_dir = "/home/davide/stanford_parser/"
+os.chdir(new_dir)
+command = "java -mx2000m -cp ./*: edu.stanford.nlp.parser.lexparser.LexicalizedParser -sentences newline -outputFormat xmlTree edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz "
+part = "4"
+s = part+".txt" #sys.argv[1]
+print(command+s)
+
+subprocess = subprocess.Popen(command+current_dir+"/"+s+" > "+current_dir+"/"+s+"_parsatp", shell=True, stdout=subprocess.PIPE)
+subprocess_return = subprocess.stdout.read()
+print(len(subprocess_return),(subprocess_return))
+
+
+
+
+
+
+
+"""""
+#dividere in più file per processing parallelo
 f = open("/home/davide/Desktop/my_dataset_sentences.txt")
 lines = f.readlines()
 for part in [1,2,3,4]:
@@ -18,25 +40,7 @@ for part in [1,2,3,4]:
         f.write(el)
 
 exit()
-current_dir = os.getcwd()
 
-new_dir = "/home/davide/stanford_parser/"
-os.chdir(new_dir)
-command = "java -mx2000m -cp ./*: edu.stanford.nlp.parser.lexparser.LexicalizedParser -sentences newline -outputFormat xmlTree edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz "
-s = "/home/davide/workspace/geometry_dataset/my_dataset_sentences.txt" #sys.argv[1]
-print(command+s)
-
-subprocess = subprocess.Popen(command+s+" > "+current_dir+"/a.txt", shell=True, stdout=subprocess.PIPE)
-subprocess_return = subprocess.stdout.read()
-print(len(subprocess_return),(subprocess_return))
-
-
-
-
-
-
-
-"""""
 # estrai gli xml dal txt unico
 with open("/home/davide/stanford_parser/sens_punt.txt", "r") as f:
     lines = f.readlines()

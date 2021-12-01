@@ -1,22 +1,6 @@
 import math
 import random
-
-def new_cordinate_circle(x1, x2, y1, y2):
-    center_x = (x2 + x1) / 2
-    center_y = (y2+y1) /2
-    radius = (x2-x1) /2
-    sin_cos = radius * math.sqrt(2) / 2
-    x1 = center_x - sin_cos
-    x2 = center_x + sin_cos
-    y1 = center_y - sin_cos
-    y2 = center_y + sin_cos
-
-    #print(s, x1, x2, y1, y2)
-    return x1, x2, y1, y2
-
-def new_cordinate(x1,x2,y1,y2):
-    min_space = 7
-    return  x1+min_space, x2-min_space,y1+min_space,y2-min_space
+from lxml import etree
 
 def select_current_color( color_list):
 
@@ -45,3 +29,41 @@ def check_completion(examples,target_num):
     for el in examples.keys():
         bool = bool and len(examples[el]['sens'])==target_num
     return not bool
+
+def new_cordinate_circle(x1, x2, y1, y2):
+    center_x = (x2 + x1) / 2
+    center_y = (y2+y1) /2
+    radius = (x2-x1) /2
+    sin_cos = radius * math.sqrt(2) / 2
+    x1 = center_x - sin_cos
+    x2 = center_x + sin_cos
+    y1 = center_y - sin_cos
+    y2 = center_y + sin_cos
+
+    #print(s, x1, x2, y1, y2)
+    return x1, x2, y1, y2
+
+def new_cordinate(x1,x2,y1,y2):
+    min_space = 7
+    return  x1+min_space, x2-min_space,y1+min_space,y2-min_space
+
+def draw_circle(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1, y2):
+    draw.ellipse([x1 - 3, y1 - 3, x2 - 3, y2 - 3], width=2, fill=rgb, outline=(0, 0, 0))
+    seg.ellipse([x1 - 3, y1 - 3, x2 - 3, y2 - 3], width=2, fill=(current_fig_n))
+    # update points
+    x1, x2, y1, y2 = new_cordinate_circle(x1, x2, y1, y2)
+    # update tree
+    child = etree.Element('node', color=color_name, shape='circle', label=str(current_fig_n))
+    last_node.append(child)
+    return child, x1, x2, y1, y2
+
+
+def draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1, y2):
+    draw.rectangle([x1 - 3, y1 - 3, x2 - 3, y2 - 3], width=2, fill=rgb, outline=(0, 0, 0))
+    seg.rectangle([x1 - 3, y1 - 3, x2 - 3, y2 - 3], width=2, fill=(current_fig_n))
+    # update points
+    x1, x2, y1, y2 = new_cordinate(x1, x2, y1, y2)
+    # update tree
+    child = etree.Element('node', color=color_name, shape='square', label=str(current_fig_n))
+    last_node.append(child)
+    return child, x1, x2, y1, y2
