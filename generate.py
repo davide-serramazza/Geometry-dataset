@@ -49,14 +49,25 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_r
     # while other level need to be generated
     while next_level:
         for (s,last_node) in zip(spaces,nodes):
-            # for each of the nodes in the upper level choose the arity of the node i.e. generate children at current level
+            # for each of the nodes in the upper level choose the arity of the node i.e. generate children at
+            # current level
             current_breadth, currents_quarter, quarter_priority = select_current_arity(breadth_range,s)
+            current_level_figures = []
             for i in range(current_breadth):
-                # for each children select current shape and color
+                # for each child select current shape and color
                 current_quarter = currents_quarter[quarter_priority[i]]
                 x1 = current_quarter[0];x2 = current_quarter[2];y1 = current_quarter[1];y2 = current_quarter[3]
-                shape = random.randint(0, 1)
-                color_name, rgb = select_current_color(color_list)
+
+                # check if the same shape is in the current level
+                already_present = True
+                while already_present:
+                    shape = random.randint(0, 1)
+                    color_name, rgb = select_current_color(color_list)
+                    current_figure=(shape,color_name)
+                    already_present = current_figure in current_level_figures
+                    current_level_figures.append(current_figure)
+
+
 
                 if shape == 0:      # square
                     child, x1, x2, y1, y2 = draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2,y1, y2)

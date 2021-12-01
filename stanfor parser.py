@@ -1,15 +1,32 @@
 import os
 import subprocess
 from tqdm import tqdm
+import sys
 
+f = open("/home/davide/Desktop/my_dataset_sentences.txt")
+lines = f.readlines()
+for part in [1,2,3,4]:
+    imgs =  []
+    sens =  []
+    for i in range((part-1)*7500,part*7500):
+        tmp = lines[i]
+        imgs.append(tmp[:8])
+        sens.append(tmp[11:])
 
+    f = open(str(part)+".txt","w+")
+    for el in sens:
+        f.write(el)
+
+exit()
+current_dir = os.getcwd()
 
 new_dir = "/home/davide/stanford_parser/"
 os.chdir(new_dir)
-command = "java -mx500m -cp ./*: edu.stanford.nlp.parser.lexparser.LexicalizedParser -outputFormat xmlTree edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz "
+command = "java -mx2000m -cp ./*: edu.stanford.nlp.parser.lexparser.LexicalizedParser -sentences newline -outputFormat xmlTree edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz "
+s = "/home/davide/workspace/geometry_dataset/my_dataset_sentences.txt" #sys.argv[1]
+print(command+s)
 
-
-subprocess = subprocess.Popen(command+s+"> senza_punt2.txt", shell=True, stdout=subprocess.PIPE)
+subprocess = subprocess.Popen(command+s+" > "+current_dir+"/a.txt", shell=True, stdout=subprocess.PIPE)
 subprocess_return = subprocess.stdout.read()
 print(len(subprocess_return),(subprocess_return))
 
