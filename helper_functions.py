@@ -47,23 +47,23 @@ def new_cordinate(x1,x2,y1,y2):
     min_space = 7
     return  x1+min_space, x2-min_space,y1+min_space,y2-min_space
 
-def draw_circle(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1, y2):
+def draw_circle(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1, y2,quarter):
     draw.ellipse([x1 - 3, y1 - 3, x2 - 3, y2 - 3], width=2, fill=rgb, outline=(0, 0, 0))
     seg.ellipse([x1 - 3, y1 - 3, x2 - 3, y2 - 3], width=2, fill=(current_fig_n))
     # update points
     x1, x2, y1, y2 = new_cordinate_circle(x1, x2, y1, y2)
     # update tree
-    child = etree.Element('node', color=color_name, shape='circle', label=str(current_fig_n))
+    child = etree.Element('node', color=color_name, shape='circle', label=str(current_fig_n),quarter=str(quarter) )
     last_node.append(child)
     return child, x1, x2, y1, y2
 
 
-def draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1, y2):
+def draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1, y2,quarter):
     draw.rectangle([x1 - 3, y1 - 3, x2 - 3, y2 - 3], width=2, fill=rgb, outline=(0, 0, 0))
     seg.rectangle([x1 - 3, y1 - 3, x2 - 3, y2 - 3], width=2, fill=(current_fig_n))
     # update points
     x1, x2, y1, y2 = new_cordinate(x1, x2, y1, y2)
     # update tree
-    child = etree.Element('node', color=color_name, shape='square', label=str(current_fig_n))
+    child = etree.Element('node', color=color_name, shape='square', label=str(current_fig_n),quarter=str(quarter) )
     last_node.append(child)
     return child, x1, x2, y1, y2

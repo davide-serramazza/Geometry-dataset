@@ -5,15 +5,15 @@ import sys
 
 
 current_dir = os.getcwd()
-
+exit()
 new_dir = "/home/davide/stanford_parser/"
 os.chdir(new_dir)
 command = "java -mx2000m -cp ./*: edu.stanford.nlp.parser.lexparser.LexicalizedParser -sentences newline -outputFormat xmlTree edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz "
-part = "4"
+part = "1"
 s = part+".txt" #sys.argv[1]
 print(command+s)
 
-subprocess = subprocess.Popen(command+current_dir+"/"+s+" > "+current_dir+"/"+s+"_parsatp", shell=True, stdout=subprocess.PIPE)
+subprocess = subprocess.Popen(command+current_dir+"/"+s+" > "+current_dir+"/"+s+"_parsed", shell=True, stdout=subprocess.PIPE)
 subprocess_return = subprocess.stdout.read()
 print(len(subprocess_return),(subprocess_return))
 
@@ -24,6 +24,23 @@ print(len(subprocess_return),(subprocess_return))
 
 
 """""
+#ricavare file xmls da txt unico ottenuto con stanforfdparser
+caps = []
+current_s=""
+fp = open("caps_parsed.txt")
+plines = fp.readlines()
+current_n=-1
+for el in plines:
+	if el=='<node value="ROOT">\n':
+		with open("xmls/001_"+str(current_n).zfill(5)+".xml","w+") as f:
+			f.write(current_s)
+		current_s=el
+		current_n+=1
+	else:
+		current_s+=el
+		
+		
+		
 #dividere in più file per processing parallelo
 f = open("/home/davide/Desktop/my_dataset_sentences.txt")
 lines = f.readlines()

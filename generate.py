@@ -23,15 +23,15 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_r
             current_level_figures = []
             for i in range(current_breadth):
                 # for each child select current shape and color
-                current_quarter = currents_quarter[quarter_priority[i]]
-                x1 = current_quarter[0];x2 = current_quarter[2];y1 = current_quarter[1];y2 = current_quarter[3]
+                selcted_quarter = currents_quarter[quarter_priority[i]]
+                x1 = selcted_quarter[0];x2 = selcted_quarter[2];y1 = selcted_quarter[1];y2 = selcted_quarter[3]
                 # check if the same shape is in the current level
                 color_name, rgb, shape = check_current_level(color_list, current_level_figures)
 
                 if shape == 0:      # square
-                    child, x1, x2, y1, y2 = draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2,y1, y2)
+                    child, x1, x2, y1, y2 = draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2,y1, y2,quarter_priority[i])
                 else:               # circle
-                    child, x1, x2, y1, y2 = draw_circle(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1, y2)
+                    child, x1, x2, y1, y2 = draw_circle(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1, y2,quarter_priority[i])
 
                 next_level_data["areas"].append( (x1,y1,x2,y2) )
                 next_level_data["subtrees"].append(child)
@@ -81,6 +81,7 @@ def check_already_generated(depth, examples, im, n_ex4depth, segmentation, sente
         bucket["imgs"].append(im)
         bucket["sens"].append(sentence)
         bucket["segs"].append(segmentation)
+
 
 def generate_sentence(tree):
     sentence=""

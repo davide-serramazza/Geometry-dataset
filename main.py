@@ -7,11 +7,11 @@ from dump_results import dump_results
 
 def main():
 
-    n_ex4depth=10 #TODO command line arg
+    n_ex4depth=20000 #TODO command line arg
     min_depth = 1
-    max_depth = 5
+    max_depth = 2
     min_breadth = 1
-    max_breadth=3
+    max_breadth=2
     depth_range = (min_depth,max_depth) #TODO coomand line arg
     breadth_range = (min_breadth,max_breadth)
     # data structure for store input and targets

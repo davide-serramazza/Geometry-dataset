@@ -9,7 +9,7 @@ print(len(lines), lines[0])
 i=0
 current_fig_n=0
 current_fig_lines=[]
-current_level=0
+current_level= sys.argv[2]
 while i<len(lines):
 	current_fig_lines.append(lines[i])
 	if lines[i]=='</node>\n':
