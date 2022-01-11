@@ -1,6 +1,17 @@
 import math
 import random
 from lxml import etree
+import copy
+
+def init_dict(max_depth, min_depth):
+    examples = dict.fromkeys([i for i in range(min_depth, max_depth)])
+    for depth in examples.keys():
+        examples[depth] = {"tot": 0}
+        buckets = {"imgs": [], "sens": [], "tree_strings": [], "segs": []}
+        examples[depth]["breaths"] = dict.fromkeys(range(1, 5))
+        for breath in examples[depth]["breaths"]:
+            examples[depth]["breaths"][breath] = copy.deepcopy(buckets)
+    return examples
 
 def select_current_color( color_list):
 
@@ -27,7 +38,7 @@ def is_final_tree_level(x1,y1,x2,y2,current_depth,depth_range):
 def check_completion(examples,target_num):
     bool = True
     for el in examples.keys():
-        bool = bool and len(examples[el]['sens'])==target_num
+        bool = bool and examples[el]['tot']==target_num
     return not bool
 
 def new_cordinate_circle(x1, x2, y1, y2):

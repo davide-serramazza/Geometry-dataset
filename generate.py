@@ -23,8 +23,8 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_r
             current_level_figures = []
             for i in range(current_breadth):
                 # for each child select current shape and color
-                selcted_quarter = currents_quarter[quarter_priority[i]]
-                x1 = selcted_quarter[0];x2 = selcted_quarter[2];y1 = selcted_quarter[1];y2 = selcted_quarter[3]
+                selected_quarter = currents_quarter[quarter_priority[i]]
+                x1 = selected_quarter[0];x2 = selected_quarter[2];y1 = selected_quarter[1];y2 = selected_quarter[3]
                 # check if the same shape is in the current level
                 color_name, rgb, shape = check_current_level(color_list, current_level_figures)
 
@@ -49,7 +49,7 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_r
 
     # finally generate sentence #TODO generate the input tree and target sentence and tree??
     sentence = generate_sentence(root.getchildren())
-    return sentence, current_depth
+    return sentence, current_depth,current_breadth
 
 
 def check_current_level(color_list, current_level_figures):
@@ -72,16 +72,16 @@ def select_current_arity(breadth_range, s):
     quarter_priority = np.random.permutation(4)
     return current_breadth, currents_quarter, quarter_priority
 
-def check_already_generated(depth, examples, im, n_ex4depth, segmentation, sentence, root):
+def check_already_generated(depth,breath, examples, im, n_ex4depth, segmentation, sentence, root):
     tree_string = etree.tostring(root, pretty_print=True)
     # check if already generated
-    bucket = examples[depth]
-    if tree_string not in bucket["tree_strings"] and len(bucket["sens"]) < n_ex4depth:
+    bucket = examples[depth]["breaths"][breath]
+    if tree_string not in bucket["tree_strings"] and examples[depth]["tot"] < n_ex4depth:
         bucket["tree_strings"].append(tree_string)
         bucket["imgs"].append(im)
         bucket["sens"].append(sentence)
         bucket["segs"].append(segmentation)
-
+        examples[depth]["tot"]+=1
 
 def generate_sentence(tree):
     sentence=""
@@ -98,7 +98,7 @@ def generate_sentence(tree):
         elif type(node)==list and node!=[]:
             if sentence.count(":")==0:
                 sentence+=": "
-            d = { 0 : "first one", 1 : "second one", 2 : "third one" , 3 : "fourth"}
+            d = { 0 : "first one", 1 : "second one", 2 : "third one" , 3 : "fourth one"}
             tmp = 0 #random.randint(0,len(completion))
             to_use = completion[tmp]
             sentence+= "the "+d[i] +" " +to_use+" "

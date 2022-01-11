@@ -21,23 +21,57 @@ print(len(subprocess_return),(subprocess_return))
 
 
 
+"""
+# dizionariIIII con caption
+import json
+f = open("/home/davide/Desktop/my_dataset_sentences.txt")
+lines = f.readlines()
+d = {}
+for el in lines:
+    d[el[:9]] =[ el[12:-1] ]
+with open("/home/davide/Desktop/all_captions.json","w+") as f:
+    json.dump(d,f)
+for el in lines:
+    d[el[:9]].append( el[12:-1].replace("square","<unk>").replace("circle","<unk>")  )
+with open("/home/davide/Desktop/all_captions2.json","w+") as f:
+    json.dump(d,f)
+"""
 
+
+
+"""
+split caption e nome pre stanford parser
+    f = open("/home/davide/Desktop/my_dataset_sentences.txt")
+    lines = f.readlines()
+    fc = open("/home/davide/Desktop/caps.txt","w+")
+    fn = open("/home/davide/Desktop/names.txt","w+")
+    for el in lines:
+        fn.write(el[:9]+"\n")
+        fc.write( el[12:])
+    fc.flush()
+    fn.flush()
+        """
 
 """""
 #ricavare file xmls da txt unico ottenuto con stanforfdparser
-caps = []
 current_s=""
-fp = open("caps_parsed.txt")
+fp = open("parsed_caps.txt")
+fn = open("names.txt")
 plines = fp.readlines()
-current_n=-1
+names = fn.readlines()
+names = ["fake\n"]+names
+i=0
 for el in plines:
-	if el=='<node value="ROOT">\n':
-		with open("xmls/001_"+str(current_n).zfill(5)+".xml","w+") as f:
-			f.write(current_s)
-		current_s=el
-		current_n+=1
-	else:
-		current_s+=el
+    if el=='<node value="ROOT">\n':
+        with open("xmls/"+names[i][:-1]+".xml","w+") as f:
+            f.write(current_s)
+        current_s=el
+        i+=1
+    else:
+        current_s+=el
+#final caption
+with open("xmls/"+names[i][:-1]+".xml","w+") as f:
+    f.write(current_s)
 		
 		
 		
@@ -57,41 +91,6 @@ for part in [1,2,3,4]:
         f.write(el)
 
 exit()
-
-# estrai gli xml dal txt unico
-with open("/home/davide/stanford_parser/sens_punt.txt", "r") as f:
-    lines = f.readlines()
-    f.close()
-
-with open("my_dataset_sentences.txt", "r") as f:
-    sens = f.readlines()
-    f.close()
-
-i=0
-curr_item=0
-s=""
-first=True
-while i<len(lines):
-    if lines[i]=='<node value="ROOT">\n':
-        if first:
-            first=False
-            s+=lines[i]
-        else:
-            name = sens[curr_item].split(" : ")[0]
-            with open("punt_xml/"+name+".xml", "w+") as f:
-                f.write(s)
-            s=lines[i]
-            curr_item+=1
-            if curr_item%1000==0:
-                print(curr_item)
-    else:
-        s+=lines[i]
-    i+=1
-
-with open("punt_xml/"+sens[-1].split(" : ")[0]+".xml", "w+") as f:
-    f.write(s)
-exit()
-
 
 
 # con punto e tutti in unico file
