@@ -2,31 +2,33 @@ from PIL import ImageDraw
 import random
 import numpy as np
 from lxml import etree
-from helper_functions import select_current_color,is_final_tree_level, draw_circle, draw_square
+from helper_functions import select_current_color,is_final_tree_level, draw_circle, draw_square,initialize_new_blank_image
 
-def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_range):
+def generate_example(color_list,min_figs,max_figs):
 
+    im, root, segmentation, spaces = initialize_new_blank_image()
     # initialize variables to use in the loop
     draw = ImageDraw.Draw(im)
-    seg = ImageDraw.Draw(segmentaion)
+    seg = ImageDraw.Draw(segmentation)
     current_depth=0
     current_fig_n=1
     nodes=[root]
     next_level = True
-    next_level_data = {"areas":[],"subtrees":[]}
+    next_level_data = {"areas":[],"subtrees":[],"parent_color":"white"}
+    figs2gen = random.randint(min_figs,max_figs)
     # while other level need to be generated
-    while next_level:
+    while next_level :
         for (s,last_node) in zip(spaces,nodes):
             # for each of the nodes in the upper level choose the arity of the node i.e. generate children at
             # current level
-            current_breadth, currents_quarter, quarter_priority = select_current_arity(breadth_range,s)
+            current_breadth, currents_quarter, quarter_priority = select_current_arity(s)
             current_level_figures = []
             for i in range(current_breadth):
                 # for each child select current shape and color
                 selected_quarter = currents_quarter[quarter_priority[i]]
                 x1 = selected_quarter[0];x2 = selected_quarter[2];y1 = selected_quarter[1];y2 = selected_quarter[3]
                 # check if the same shape is in the current level
-                color_name, rgb, shape = check_current_level(color_list, current_level_figures)
+                color_name, rgb, shape = check_current_level(color_list, current_level_figures,last_node)
 
                 if shape == 0:      # square
                     child, x1, x2, y1, y2 = draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2,y1, y2,quarter_priority[i])
@@ -35,12 +37,16 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_r
 
                 next_level_data["areas"].append( (x1,y1,x2,y2) )
                 next_level_data["subtrees"].append(child)
+                if current_fig_n == figs2gen:
+                    sentence = generate_sentence(root.getchildren())
+                    return sentence, current_fig_n,im,segmentation,root
                 current_fig_n+=1
 
         # if conditions are met choose if a new level must be generated and in this case update data structure for
         # the next iteration
         current_depth += 1
-        next_level = is_final_tree_level(x1, y1, x2, y2,current_depth,depth_range)
+        next_level = current_depth < 3
+        #next_level = is_final_tree_level(x1, y1, x2, y2,current_depth,depth_range)
         if next_level:  #TODO move in is_final_tree_level function
             spaces = next_level_data["areas"]
             next_level_data["areas"] = []
@@ -48,40 +54,38 @@ def generate_example(spaces,im,segmentaion,root,color_list,depth_range,breadth_r
             next_level_data["subtrees"] = []
 
     # finally generate sentence #TODO generate the input tree and target sentence and tree??
-    sentence = generate_sentence(root.getchildren())
-    return sentence, current_depth,current_breadth
+    return None
 
 
-def check_current_level(color_list, current_level_figures):
+def check_current_level(color_list, current_level_figures,last_node):
     already_present = True
     while already_present:
         shape = random.randint(0, 1)
-        color_name, rgb = select_current_color(color_list)
+        color_name, rgb = select_current_color(color_list,last_node.attrib["color"])
         current_figure = (shape, color_name)
         already_present = current_figure in current_level_figures
         current_level_figures.append(current_figure)
     return color_name, rgb, shape
 
-def select_current_arity(breadth_range, s):
+def select_current_arity(s):
     x1 = s[0];x2 = s[2];y1 = s[1];y2 = s[3]
     currents_quarter = [(x1, y1, x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2),
                         (x1 + (x2 - x1) / 2, y1, x2, y1 + (y2 - y1) / 2),
                         (x1, y1 + (y2 - y1) / 2, x1 + (x2 - x1) / 2, y2),
                         (x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2, x2, y2)]
-    current_breadth = random.randint(breadth_range[0], breadth_range[1])
+    current_breadth = random.randint(1,4)
     quarter_priority = np.random.permutation(4)
     return current_breadth, currents_quarter, quarter_priority
 
-def check_already_generated(depth,breath, examples, im, n_ex4depth, segmentation, sentence, root):
+def check_already_generated(figs_n, examples, im, n_ex4depth, segmentation, sentence, root):
     tree_string = etree.tostring(root, pretty_print=True)
     # check if already generated
-    bucket = examples[depth]["breaths"][breath]
-    if tree_string not in bucket["tree_strings"] and examples[depth]["tot"] < n_ex4depth:
+    bucket = examples[figs_n]
+    if tree_string not in bucket["tree_strings"] and len(bucket["imgs"]) < n_ex4depth:
         bucket["tree_strings"].append(tree_string)
         bucket["imgs"].append(im)
         bucket["sens"].append(sentence)
         bucket["segs"].append(segmentation)
-        examples[depth]["tot"]+=1
 
 def generate_sentence(tree):
     sentence=""

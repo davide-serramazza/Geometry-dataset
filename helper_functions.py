@@ -1,22 +1,23 @@
 import math
 import random
 from lxml import etree
+from PIL import Image
 import copy
 
-def init_dict(max_depth, min_depth):
-    examples = dict.fromkeys([i for i in range(min_depth, max_depth)])
-    for depth in examples.keys():
-        examples[depth] = {"tot": 0}
+def init_dict(min_figs, max_figs):
+    examples = dict.fromkeys([i for i in range(min_figs, max_figs+1)])
+    for n_figs in examples.keys():
         buckets = {"imgs": [], "sens": [], "tree_strings": [], "segs": []}
-        examples[depth]["breaths"] = dict.fromkeys(range(1, 5))
-        for breath in examples[depth]["breaths"]:
-            examples[depth]["breaths"][breath] = copy.deepcopy(buckets)
+        examples[n_figs] = copy.deepcopy(buckets)
     return examples
 
-def select_current_color( color_list):
+def select_current_color( color_list, parent_color):
 
-    choosed_color = random.randint(0, len(color_list) - 1)
-    new_color,rgb = color_list[choosed_color]
+    choosed_color = parent_color
+    while choosed_color==parent_color:
+        idx = random.randint(0, len(color_list) - 1)
+        choosed_color = color_list [idx]
+    new_color,rgb = choosed_color
     return new_color,rgb
 
 def is_final_tree_level(x1,y1,x2,y2,current_depth,depth_range):
@@ -37,8 +38,8 @@ def is_final_tree_level(x1,y1,x2,y2,current_depth,depth_range):
 
 def check_completion(examples,target_num):
     bool = True
-    for el in examples.keys():
-        bool = bool and examples[el]['tot']==target_num
+    for n_figs in examples.keys():
+        bool = bool and len(examples[n_figs]['imgs'])==target_num
     return not bool
 
 def new_cordinate_circle(x1, x2, y1, y2):
@@ -78,3 +79,11 @@ def draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2, y1
     child = etree.Element('node', color=color_name, shape='square', label=str(current_fig_n),quarter=str(quarter) )
     last_node.append(child)
     return child, x1, x2, y1, y2
+
+def initialize_new_blank_image():
+    im = Image.new('RGB', (550, 550), (255, 255, 255))
+    segmentation = Image.new('L', (550, 550), (0))
+    root = etree.Element("root", color="white", label=str(0))
+    x1 = 0; x2 = 550; y1 = 0; y2 = 550  # TODO togliere costanti
+    spaces = [(x1, y1, x2, y2)]
+    return im, root, segmentation, spaces
