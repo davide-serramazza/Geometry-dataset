@@ -21,6 +21,7 @@ def select_current_color( color_list, parent_color):
     return new_color,rgb
 
 def is_final_tree_level(x1,y1,x2,y2,current_depth,depth_range):
+    #TODO conditions like x1 + c are necessary?
     min_depth = depth_range[0]
     max_depth = depth_range[1]
     if current_depth==(max_depth-1):
