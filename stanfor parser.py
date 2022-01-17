@@ -46,8 +46,8 @@ split caption e nome pre stanford parser
     fc = open("/home/davide/Desktop/caps.txt","w+")
     fn = open("/home/davide/Desktop/names.txt","w+")
     for el in lines:
-        fn.write(el[:9]+"\n")
-        fc.write( el[12:])
+        fn.write(el[:8]+"\n")
+        fc.write( el[11:])
     fc.flush()
     fn.flush()
         """

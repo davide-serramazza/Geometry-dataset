@@ -20,28 +20,14 @@ def select_current_color( color_list, parent_color):
     new_color,rgb = choosed_color
     return new_color,rgb
 
-def is_final_tree_level(x1,y1,x2,y2,current_depth,depth_range):
-    #TODO conditions like x1 + c are necessary?
-    min_depth = depth_range[0]
-    max_depth = depth_range[1]
-    if current_depth==(max_depth-1):
-        next_level = False
-    elif current_depth>=min_depth:
-        next_level = (x1+13<x2 and y1+13<y2) and random.random() > 0.5
-    else:
-        next_level = (x1+13<x2 and y1+13<y2)
-    #TODO next step is to try different captions for one image
-    #completion = [" containing"]#, " that contains", " which contains", " having inside", " which has"," that has", ]
-    #if next_level:
-    #    tmp = 0 #random.randint(0,3)
-    #    sentence+=completion[tmp]
-    return next_level#,sentence
-
-def check_completion(examples,target_num):
-    bool = True
-    for n_figs in examples.keys():
-        bool = bool and len(examples[n_figs]['imgs'])==target_num
-    return not bool
+def update_for_next_level(next_level_data):
+    spaces = next_level_data["areas"]
+    next_level_data["areas"] = []
+    nodes = next_level_data["subtrees"]
+    next_level_data["subtrees"] = []
+    parent_colors = next_level_data["parent_color"]
+    next_level_data["parent_color"] = []
+    return spaces,nodes,parent_colors
 
 def new_cordinate_circle(x1, x2, y1, y2):
     center_x = (x2 + x1) / 2
@@ -88,3 +74,14 @@ def initialize_new_blank_image():
     x1 = 0; x2 = 550; y1 = 0; y2 = 550  # TODO togliere costanti
     spaces = [(x1, y1, x2, y2)]
     return im, root, segmentation, spaces
+
+
+def check_already_generated(figs_n, examples, im, n_ex4depth, segmentation, sentence, root):
+    tree_string = etree.tostring(root, pretty_print=True)
+    # check if already generated
+    bucket = examples[figs_n]
+    if tree_string not in bucket["tree_strings"] and len(bucket["imgs"]) < n_ex4depth:
+        bucket["tree_strings"].append(tree_string)
+        bucket["imgs"].append(im)
+        bucket["sens"].append(sentence)
+        bucket["segs"].append(segmentation)

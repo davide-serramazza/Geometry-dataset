@@ -1,32 +1,27 @@
 from color import color_list
-from generate import generate_example, check_already_generated
-from helper_functions import check_completion, init_dict
+from generate import generate_example
+from helper_functions import check_already_generated, init_dict
 from dump_results import dump_results
 
 def main():
 
-    n_ex4depth=10 #TODO command line arg
-    min_figs = 5
-    max_figs = 8
+    n_ex4depth=1000 #TODO command line arg
+    min_figs = 2
+    max_figs = 11
     # data structure for store input and targets
     examples = init_dict(min_figs, max_figs)
 
     # initialize while condition, number of loop counter and file for "plain" sentences
     for j in range(min_figs,max_figs+1):
-        to_continue =True
         i=0
-        while to_continue:
+        while len(examples[j]["imgs"]) < n_ex4depth:
 
-            # create whire background, initial segmentation map and root of the tree
             ris = generate_example(color_list,j)
-
             if ris!=None:
-                sentence,figs_n,im,segmentation,root =ris
+                sentence,figs_n,im,segmentation,root = ris
                 check_already_generated(figs_n, examples, im, n_ex4depth, segmentation, sentence, root)
-                # check completion of the loop
-                to_continue = ( len(examples[j]["imgs"]) < n_ex4depth )
 
-            # print current filling level of store data structure
+            # print how much are already generated
             i+=1
             if i%1000==0:
                 for n_figs in examples.keys():
