@@ -22,9 +22,11 @@ def analyze_first_level(first_level_first, first_level_second, matched, tot):
                 matched += 1
     return matched, tot
 
-def clean_string(fig,to_del):
-    for el in to_del:
-        fig = fig.replace(el,"")
+def clean_string(fig,dict):
+    for el in dict.keys():
+        if el in fig:
+            fig = fig.replace(el,"")
+            break
 
     if fig.startswith("  a"):
             fig=fig[4:]
@@ -33,7 +35,7 @@ def clean_string(fig,to_del):
     if fig.startswith("a"):
         fig=fig[2:]
     fig = fig.replace(" \n", "").replace("\n","").replace("and", "")
-    return fig
+    return fig, (dict[el]+1)
 
 def analyze_second_third_level(first, second, matched, tot):
     # dictionary of level
@@ -41,6 +43,7 @@ def analyze_second_third_level(first, second, matched, tot):
                'the third one containing' :2,'the fourth one containing':3,  'the <unk> one containing':4 }
     to_del = list(d_level.keys())
     first_figs = first.split(";")
+
     for breadth in first_figs:
         # for each branch of the tree
         figs = breadth.split("and")
@@ -52,9 +55,16 @@ def analyze_second_third_level(first, second, matched, tot):
                     tot+=1
                     figAndthird_level= fig.split(" in ")
                     fig = figAndthird_level[0]
-                    fig = clean_string(fig,to_del)
-                    if fig in second:
-                        matched+=1
+                    fig,position = clean_string(fig,d_level)
+
+                    try:
+                        if fig in second.split("the ")[position].replace(";","").replace("\n",""):
+                            matched+=1
+                    except IndexError:
+                        a=2
+
+
+
                     try:
                         third_level = figAndthird_level[1]
                     except IndexError:
