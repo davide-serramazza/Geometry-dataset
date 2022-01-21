@@ -1,4 +1,4 @@
-import json
+import os
 
 def take_sen(f_name):
     f = open(f_name)
@@ -22,14 +22,25 @@ def analyze_first_level(first_level_first, first_level_second, matched, tot):
                 matched += 1
     return matched, tot
 
+def clean_string(fig,to_del):
+    for el in to_del:
+        fig = fig.replace(el,"")
+
+    if fig.startswith("  a"):
+            fig=fig[4:]
+    if fig.startswith(" a"):
+        fig=fig[3:]
+    if fig.startswith("a"):
+        fig=fig[2:]
+    fig = fig.replace(" \n", "").replace("\n","").replace("and", "")
+    return fig
+
 def analyze_second_third_level(first, second, matched, tot):
     # dictionary of level
     d_level = {'the first one containing': 0,'the second one containing':1,
-               'the third one containing' :2,'the fourth one containing':3 }
+               'the third one containing' :2,'the fourth one containing':3,  'the <unk> one containing':4 }
     to_del = list(d_level.keys())
     first_figs = first.split(";")
-    if first.count(" in turn ")>0:
-        a=2
     for breadth in first_figs:
         # for each branch of the tree
         figs = breadth.split("and")
@@ -39,21 +50,16 @@ def analyze_second_third_level(first, second, matched, tot):
                 if fig.count("square")>0 or fig.count("circle")>0:
                     # if and only if is really the description of a figure
                     tot+=1
-                    # remove the not necessary strings
-                    for el in to_del:
-                        fig = fig.replace(el,"")
-                    if len(fig.split(" in "))>1:
-                        fig=fig.split(" in ")[0]
-                    # TODO creare una funzione nella quale vvado a rimuovere tutte le possibile altre cose (Aggiungere anche "\n ed "  \n")
-                    if fig.startswith("  a"):
-                        fig=fig[4:]
-                    if fig.startswith(" a"):
-                        fig=fig[3:]
-                    if fig.startswith("a"):
-                        fig=fig[2:]
-                    if fig.replace(" \n", "").replace("and", "") in second:
+                    figAndthird_level= fig.split(" in ")
+                    fig = figAndthird_level[0]
+                    fig = clean_string(fig,to_del)
+                    if fig in second:
                         matched+=1
-                    print(fig.replace(" \n", ""))
+                    try:
+                        third_level = figAndthird_level[1]
+                    except IndexError:
+                        a = 2
+
 
     return matched, tot
 
@@ -73,11 +79,13 @@ def first_in_second(first_d,second_d):
                 second_level_second = second_d[el].split(" : ")[1]
             except IndexError:
                 second_level_second =""
-            a=2
             matched_second,tot_second=analyze_second_third_level(second_level_first, second_level_second, matched_second, tot_second)
     print("first level ",tot_first,matched_first/tot_first)
     print("second level ",tot_second,matched_second/tot_second)
 
+
+files = os.listdir("/home/davide/valentia_galli/")
+files.sort()
 file_n="emb_dim_500_rnn_units_300_beta_0.0_hidden_coeff_4_lambd_8_drop_rate_0.2_it=60_beam=True.txt"
 preds_d = take_sen("/home/davide/valentia_galli/"+file_n)
 refs = take_sen("/home/davide/valentia_galli/my_dataset_sentences2.txt")
@@ -87,8 +95,10 @@ for el in preds_d.keys():
 print(len(preds_d),len(refs_d))
 
 first_in_second(preds_d,refs_d)
-#first_in_second(refs_d,preds_d)
+first_in_second(refs_d,preds_d)
 
+
+#migliore  emb_dim_500_rnn_units_300_beta_0.0_hidden_coeff_4_lambd_8_drop_rate_0.2_it=60_beam=True.txt
 
 
 
