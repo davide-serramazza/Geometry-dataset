@@ -37,11 +37,10 @@ def clean_string(fig,dict):
     fig = fig.replace(" \n", "").replace("\n","").replace("and", "")
     return fig, (dict[el]+1)
 
-def analyze_second_third_level(first, second, matched, tot):
+def analyze_second_third_level(first, second, matched, tot,matched_third,tot_third):
     # dictionary of level
     d_level = {'the first one containing': 0,'the second one containing':1,
                'the third one containing' :2,'the fourth one containing':3,  'the <unk> one containing':4 }
-    to_del = list(d_level.keys())
     first_figs = first.split(";")
 
     for breadth in first_figs:
@@ -63,21 +62,24 @@ def analyze_second_third_level(first, second, matched, tot):
                     except IndexError:
                         a=2
 
-
-
                     try:
                         third_level = figAndthird_level[1]
+                        tot_third+=1
+                        if third_level in second.split("the ")[position].replace(";","").replace("\n",""):
+                            matched_third+=1
                     except IndexError:
                         a = 2
 
 
-    return matched, tot
+    return matched, tot, matched_third,tot_third
 
 def first_in_second(first_d,second_d):
     tot_first = 0
     matched_first = 0
     tot_second = 0
     matched_second = 0
+    matched_third = 0
+    tot_third = 0
     imgs = list( first_d.keys())
     for el in imgs:
         first_level_first = first_d[el].split(" : ")[0]
@@ -89,23 +91,27 @@ def first_in_second(first_d,second_d):
                 second_level_second = second_d[el].split(" : ")[1]
             except IndexError:
                 second_level_second =""
-            matched_second,tot_second=analyze_second_third_level(second_level_first, second_level_second, matched_second, tot_second)
-    print("first level ",tot_first,matched_first/tot_first)
-    print("second level ",tot_second,matched_second/tot_second)
+            matched_second,tot_second, matched_third, tot_third=analyze_second_third_level(second_level_first,
+                    second_level_second, matched_second, tot_second,matched_third,tot_third)
+    print("first level ",tot_first,matched_first,matched_first/tot_first)
+    print("second level ",tot_second,matched_second,matched_second/tot_second)
+    print("third level ",tot_third,matched_third,matched_third/tot_third)
 
-
-files = os.listdir("/home/davide/valentia_galli/")
+base = "/home/davide/valentia_galli/preds/24_01/"
+files = os.listdir(base)
 files.sort()
-file_n="emb_dim_500_rnn_units_300_beta_0.0_hidden_coeff_4_lambd_8_drop_rate_0.2_it=60_beam=True.txt"
-preds_d = take_sen("/home/davide/valentia_galli/"+file_n)
-refs = take_sen("/home/davide/valentia_galli/my_dataset_sentences2.txt")
-refs_d = {}
-for el in preds_d.keys():
-    refs_d[el] = refs[el]
-print(len(preds_d),len(refs_d))
+for el in files:
+    file_n=el
+    print("\n",file_n)
+    preds_d = take_sen(base+file_n)
+    refs = take_sen("/home/davide/valentia_galli/my_dataset_sentences2.txt")
+    refs_d = {}
+    for el in preds_d.keys():
+        refs_d[el] = refs[el]
+    print(len(preds_d),len(refs_d))
 
-first_in_second(preds_d,refs_d)
-first_in_second(refs_d,preds_d)
+    first_in_second(preds_d,refs_d)
+    first_in_second(refs_d,preds_d)
 
 
 #migliore  emb_dim_500_rnn_units_300_beta_0.0_hidden_coeff_4_lambd_8_drop_rate_0.2_it=60_beam=True.txt
