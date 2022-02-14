@@ -76,11 +76,11 @@ def initialize_new_blank_image():
     return im, root, segmentation, spaces
 
 
-def check_already_generated(figs_n, examples, im, n_ex4depth, segmentation, sentence, root):
+def check_already_generated(figs_n, examples, im, n_ex4figs_n, segmentation, sentence, root):
     tree_string = etree.tostring(root, pretty_print=True)
     # check if already generated
     bucket = examples[figs_n]
-    if tree_string not in bucket["tree_strings"] and len(bucket["imgs"]) < n_ex4depth:
+    if tree_string not in bucket["tree_strings"] and len(bucket["imgs"]) < n_ex4figs_n:
         bucket["tree_strings"].append(tree_string)
         bucket["imgs"].append(im)
         bucket["sens"].append(sentence)

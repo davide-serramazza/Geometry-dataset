@@ -26,6 +26,7 @@ def generate_example(color_list,figs2gen):
                 # check if the same shape is in the current level
                 color_name, rgb, shape = choose_figure2generate(color_list, current_level_figures,last_node,parent_c)
 
+                current_fig_n+=1
                 if shape == 0:      # square
                     child, x1, x2, y1, y2 = draw_square(color_name, current_fig_n, draw, last_node, rgb, seg, x1, x2,y1, y2,quarter_priority[i])
                 else:               # circle
@@ -34,7 +35,6 @@ def generate_example(color_list,figs2gen):
                 next_level_data["areas"].append( (x1,y1,x2,y2) )
                 next_level_data["subtrees"].append(child)
                 next_level_data["parent_color"].append(color_name)
-                current_fig_n+=1
                 if current_fig_n == figs2gen:
                     sentence = generate_sentence(root.getchildren())
                     return sentence, current_fig_n,im,segmentation,root
@@ -68,6 +68,7 @@ def select_current_arity(s):
 
 def generate_sentence(tree):
     sentence=""
+    # choose the linking phrase between first and second level
     completion = ["containing"]#, " that contains", " which contains", " having inside", " which has"," that has", ]
     first_level_n = len(tree)
 
@@ -77,25 +78,32 @@ def generate_sentence(tree):
     i=0
     for node in tree:
         if type(node)==etree._Element:
+            # first level thus describes color and shape type
             sentence+="and a " + node.attrib["color"]+" "+node.attrib["shape"]+" "
         elif type(node)==list and node!=[]:
+            # second level thus first of all insert ':' if it is the first one
             if sentence.count(":")==0:
                 sentence+=": "
             d = { 0 : "first one", 1 : "second one", 2 : "third one" , 3 : "fourth one"}
             tmp = 0 #random.randint(0,len(completion))
             to_use = completion[tmp]
             sentence+= "the "+d[i] +" " +to_use+" "
+
+            # then desribes the current nodes
             for child in node:
                 grandchild = len(child.getchildren())
                 if child!=node[0]:
-                    sentence+="and "
+                    sentence+=" and "
                 if grandchild>0:
+                    # and in case there is also a third level just enumerate number of shapes
                     sentence+="a " + child.attrib["color"]+" "+child.attrib["shape"]+ " in turn "+to_use+ " " + str(grandchild)+" other shapes "
                 else:
+                    # otherwise just color and name of the second level
                     sentence+="a " + child.attrib["color"]+" "+child.attrib["shape"]
-            sentence=sentence[:-1]+"; "
+            sentence+="; "
             i+=1
-    if tree[-1]==[] :
-        return sentence[4:-1]
-    else:
-        return sentence[4:-2]
+
+    # remove the ending '; ' and the starting 'and '
+    if sentence.endswith("; "):
+        sentence=sentence[:-2]
+    return sentence[4:]
